@@ -15,7 +15,7 @@ class QHotkeyPrivateWin : public QHotkeyPrivate
 public:
 	QHotkeyPrivateWin();
 	// QAbstractNativeEventFilter interface
-	bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) Q_DECL_OVERRIDE;
+	bool nativeEventFilter(const QByteArray &eventType, void *message, _NATIVE_EVENT_RESULT *result) override;
 
 protected:
 	void pollForHotkeyRelease();
@@ -42,7 +42,7 @@ bool QHotkeyPrivate::isPlatformSupported()
 	return true;
 }
 
-bool QHotkeyPrivateWin::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool QHotkeyPrivateWin::nativeEventFilter(const QByteArray &eventType, void *message, _NATIVE_EVENT_RESULT *result)
 {
 	Q_UNUSED(eventType)
 	Q_UNUSED(result)
@@ -71,7 +71,7 @@ quint32 QHotkeyPrivateWin::nativeKeycode(Qt::Key keycode, bool &ok)
 {
 	ok = true;
 	if(keycode <= 0xFFFF) {//Try to obtain the key from it's "character"
-		const SHORT vKey = VkKeyScanW(keycode);
+		const SHORT vKey = VkKeyScanW(static_cast<WCHAR>(keycode));
 		if(vKey > -1)
 			return LOBYTE(vKey);
 	}
@@ -267,8 +267,7 @@ bool QHotkeyPrivateWin::registerShortcut(QHotkey::NativeShortcut shortcut)
 	if(ok)
 		return true;
 	else {
-		qCWarning(logQHotkey) << "Failed to register hotkey. Error:"
-							  << qPrintable(QHotkeyPrivateWin::formatWinError(::GetLastError()));
+		error = QHotkeyPrivateWin::formatWinError(::GetLastError());
 		return false;
 	}
 }
@@ -279,8 +278,7 @@ bool QHotkeyPrivateWin::unregisterShortcut(QHotkey::NativeShortcut shortcut)
 	if(ok)
 		return true;
 	else {
-		qCWarning(logQHotkey) << "Failed to unregister hotkey. Error:"
-							  << qPrintable(QHotkeyPrivateWin::formatWinError(::GetLastError()));
+		error = QHotkeyPrivateWin::formatWinError(::GetLastError());
 		return false;
 	}
 }

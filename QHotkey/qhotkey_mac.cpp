@@ -7,7 +7,7 @@ class QHotkeyPrivateMac : public QHotkeyPrivate
 {
 public:
 	// QAbstractNativeEventFilter interface
-	bool nativeEventFilter(const QByteArray &eventType, void *message, long *result) Q_DECL_OVERRIDE;
+	bool nativeEventFilter(const QByteArray &eventType, void *message, _NATIVE_EVENT_RESULT *result) override;
 
 	static OSStatus hotkeyPressEventHandler(EventHandlerCallRef nextHandler, EventRef event, void* data);
 	static OSStatus hotkeyReleaseEventHandler(EventHandlerCallRef nextHandler, EventRef event, void* data);
@@ -33,7 +33,7 @@ bool QHotkeyPrivate::isPlatformSupported()
 bool QHotkeyPrivateMac::isHotkeyHandlerRegistered = false;
 QHash<QHotkey::NativeShortcut, EventHotKeyRef> QHotkeyPrivateMac::hotkeyRefs;
 
-bool QHotkeyPrivateMac::nativeEventFilter(const QByteArray &eventType, void *message, long *result)
+bool QHotkeyPrivateMac::nativeEventFilter(const QByteArray &eventType, void *message, _NATIVE_EVENT_RESULT *result)
 {
 	Q_UNUSED(eventType)
 	Q_UNUSED(message)
@@ -227,8 +227,7 @@ bool QHotkeyPrivateMac::registerShortcut(QHotkey::NativeShortcut shortcut)
 										  0,
 										  &eventRef);
 	if (status != noErr) {
-		qCWarning(logQHotkey) << "Failed to register hotkey. Error:"
-							  << status;
+		error = QString::number(status);
 		return false;
 	} else {
 		this->hotkeyRefs.insert(shortcut, eventRef);
@@ -241,8 +240,7 @@ bool QHotkeyPrivateMac::unregisterShortcut(QHotkey::NativeShortcut shortcut)
 	EventHotKeyRef eventRef = QHotkeyPrivateMac::hotkeyRefs.value(shortcut);
 	OSStatus status = UnregisterEventHotKey(eventRef);
 	if (status != noErr) {
-		qCWarning(logQHotkey) << "Failed to unregister hotkey. Error:"
-							  << status;
+		error = QString::number(status);
 		return false;
 	} else {
 		this->hotkeyRefs.remove(shortcut);
