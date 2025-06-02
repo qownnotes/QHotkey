@@ -1,4 +1,4 @@
-CONFIG += C++20
+CONFIG += C++11
 
 PUBLIC_HEADERS += $$PWD/QHotkey/qhotkey.h \
 	$$PWD/QHotkey/QHotkey
