@@ -132,8 +132,10 @@ quint32 QHotkeyPrivateX11::nativeKeycode(Qt::Key keycode, bool &ok)
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
 	const QNativeInterface::QX11Application *x11Interface = qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
-    if (!x11Interface)
+    if (!x11Interface) {
         return 0;
+    }
+
 	Display *display = x11Interface->display();
 #else
 	const bool x11Interface = QX11Info::isPlatformX11();
