@@ -6,10 +6,8 @@ else:unix {
 			error("Qt 6.2.0 or greater is required when using Qt6")
 		}
 	}
-	else {
-		lessThan(QT_MAJOR_VERSION, 6) {
-			QT += x11extras
-		}
+	else:equals(QT_MAJOR_VERSION, 5) {
+		QT += x11extras
 	}
 	LIBS += -lX11
 }
